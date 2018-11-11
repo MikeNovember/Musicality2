@@ -59,14 +59,21 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean startPlayer() {
+    private boolean startPlayer(final int msec) {
         try {
             mPlayer = new MediaPlayer();
+            mPlayer.reset();
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mPlayer.setDataSource(getApplicationContext(), mCurrentTrack);
             mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
+                    mPlayer.seekTo(msec);
+                }
+            });
+            mPlayer.setOnSeekCompleteListener(new MediaPlayer.OnSeekCompleteListener() {
+                @Override
+                public void onSeekComplete(MediaPlayer mp) {
                     mPlayer.start();
                 }
             });
@@ -79,11 +86,11 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void playTrack(Uri uri) {
+    private void playTrack(Uri uri, int msec) {
         mCurrentTrack = uri;
         refreshTrackView();
         killPlayer();
-        startPlayer();
+        startPlayer(msec);
     }
 
     @Override
@@ -101,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
         mPlayButton.setOnClickListener( new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                playTrack(Uri.parse(mTrackEdit.getText().toString()));
+                playTrack(Uri.parse(mTrackEdit.getText().toString()), 0);
             }
         });
 
