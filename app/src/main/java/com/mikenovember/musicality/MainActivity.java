@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.net.UrlQuerySanitizer;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +18,6 @@ import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
     private static final String LOGGER_TAG = "MainActivity";
-
     private static final String CURRENT_TRACK_URI = "currentTrackUri";
 
     private Uri mCurrentTrack;
@@ -26,6 +25,24 @@ public class MainActivity extends AppCompatActivity {
     private EditText mTrackEdit;
     private Button mPlayButton;
     private MediaPlayer mPlayer;
+    private ITrackRepository mRepository;
+
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
+            return true;
+        }
+        return false;
+    }
 
     private void refreshTrackView(){
         mTrackView.setText(mCurrentTrack.toString());
@@ -84,6 +101,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
         refreshTrackView();
+
+        if (isExternalStorageReadable())
+            mRepository = new StorageTrackRepository();
+        else
+            Log.e(LOGGER_TAG, "Cannot read from external storage");
     }
 
     @Override
@@ -96,21 +118,4 @@ public class MainActivity extends AppCompatActivity {
         ed.putString(CURRENT_TRACK_URI, mCurrentTrack.toString());
         ed.commit();
     }
-
-    /*
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        Log.v(LOGGER_TAG, "onSaveInstanceState()");
-        super.onSaveInstanceState(outState);
-        outState.putString(CURRENT_TRACK_URI, mCurrentTrack.toString());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        Log.v(LOGGER_TAG, "onRestoreInstanceState()");
-        super.onRestoreInstanceState(savedInstanceState);
-        mCurrentTrack = Uri.parse(savedInstanceState.getString(CURRENT_TRACK_URI));
-        refreshTrackView();
-    }
-    */
 }
