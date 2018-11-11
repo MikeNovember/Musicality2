@@ -87,7 +87,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void playTrack(Uri uri, int msec) {
-        mCurrentTrack = uri;
+        if (!uri.toString().isEmpty())
+            mCurrentTrack = uri;
         refreshTrackView();
         killPlayer();
         startPlayer(msec);
@@ -114,8 +115,16 @@ public class MainActivity extends AppCompatActivity {
 
         refreshTrackView();
 
-        if (isExternalStorageReadable())
+        if (isExternalStorageReadable()) {
             mRepository = new StorageTrackRepository();
+            for (ITrackRepository.StreamInfo track : mRepository.getAllTracks()) {
+                Log.d(LOGGER_TAG, "title: " + track.mTitle);
+                Log.d(LOGGER_TAG, "url: " + track.mUriString);
+                for (long beat : track.mMusicalityData.mStructure.mAllBeats)
+                    Log.d(LOGGER_TAG, "beat: " + beat);
+                Log.d(LOGGER_TAG, "beatCount: " + track.mMusicalityData.mStructure.mAllBeats.size());
+            }
+        }
         else
             Log.e(LOGGER_TAG, "Cannot read from external storage");
     }

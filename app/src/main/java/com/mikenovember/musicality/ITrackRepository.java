@@ -4,13 +4,12 @@ import org.w3c.dom.Document;
 
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 public interface ITrackRepository {
     class StreamInfo{
         public StreamInfo(Document xml){
-            // do magic here
-            mMusicalityData = new TrackMusicalityData(xml);
+            this.mTitle = xml.getDocumentElement().getAttribute("title");
+            this.mUriString = xml.getDocumentElement().getAttribute("url");
+            this.mMusicalityData = new TrackMusicalityData(xml);
         }
 
         public String mUriString;
