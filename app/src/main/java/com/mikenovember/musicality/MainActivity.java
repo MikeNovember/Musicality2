@@ -64,8 +64,13 @@ public class MainActivity extends AppCompatActivity {
             mPlayer = new MediaPlayer();
             mPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mPlayer.setDataSource(getApplicationContext(), mCurrentTrack);
-            mPlayer.prepare();
-            mPlayer.start();
+            mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mPlayer.start();
+                }
+            });
+            mPlayer.prepareAsync();
         } catch (IOException e)
         {
             Log.v(LOGGER_TAG, e.getMessage());
@@ -74,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    private void playTrack(Uri uri){
+    private void playTrack(Uri uri) {
         mCurrentTrack = uri;
         refreshTrackView();
         killPlayer();
