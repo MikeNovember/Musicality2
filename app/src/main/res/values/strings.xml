@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Musicality</string>
+    <string name="title_activity_song_select">SongSelectActivity</string>
 </resources>

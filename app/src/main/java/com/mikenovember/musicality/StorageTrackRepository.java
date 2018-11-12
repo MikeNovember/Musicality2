@@ -39,9 +39,9 @@ public class StorageTrackRepository implements ITrackRepository {
     }
 
     @Override
-    public List<StreamInfo> getAllTracks(){
+    public ArrayList<StreamInfo> getAllTracks(){
         List<File> tracks = getFileList(DEFAULT_LOCATION);
-        List<StreamInfo> streams = new ArrayList<>();
+        ArrayList<StreamInfo> streams = new ArrayList<>();
 
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

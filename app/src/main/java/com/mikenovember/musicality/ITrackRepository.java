@@ -2,6 +2,7 @@ package com.mikenovember.musicality;
 
 import org.w3c.dom.Document;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface ITrackRepository {
@@ -19,6 +20,6 @@ public interface ITrackRepository {
 
     StreamInfo getRandomTrack();
     StreamInfo findByTitle(String title);
-    List<StreamInfo> getAllTracks();
+    ArrayList<StreamInfo> getAllTracks();
     List<StreamInfo> lookupByTitle(String title);
 }

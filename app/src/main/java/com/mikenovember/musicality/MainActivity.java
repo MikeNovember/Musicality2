@@ -1,12 +1,12 @@
 package com.mikenovember.musicality;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -19,30 +19,14 @@ import java.io.IOException;
 public class MainActivity extends AppCompatActivity {
     private static final String LOGGER_TAG = "MainActivity";
     private static final String CURRENT_TRACK_URI = "currentTrackUri";
+    public static final String TRACK_URL_KEY = "url";
 
     private Uri mCurrentTrack;
     private TextView mTrackView;
     private EditText mTrackEdit;
     private Button mPlayButton;
+    private Button mSelectButton;
     private MediaPlayer mPlayer;
-    private ITrackRepository mRepository;
-
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    public boolean isExternalStorageReadable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state) ||
-                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-            return true;
-        }
-        return false;
-    }
 
     private void refreshTrackView(){
         mTrackView.setText(mCurrentTrack.toString());
@@ -94,6 +78,18 @@ public class MainActivity extends AppCompatActivity {
         startPlayer(msec);
     }
 
+    private void selectTrack() {
+        Intent intent = new Intent(this, SongSelectActivity.class);
+        startActivityForResult(intent, 0);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == 0)
+            if (resultCode == RESULT_OK)
+                mCurrentTrack = Uri.parse(data.getStringExtra(TRACK_URL_KEY));
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -105,6 +101,7 @@ public class MainActivity extends AppCompatActivity {
         mTrackView = findViewById(R.id.track_view);
         mTrackEdit = findViewById(R.id.track_edit);
         mPlayButton = findViewById(R.id.play_button);
+        mSelectButton = findViewById(R.id.select_button);
 
         mPlayButton.setOnClickListener( new View.OnClickListener() {
             @Override
@@ -113,20 +110,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        refreshTrackView();
-
-        if (isExternalStorageReadable()) {
-            mRepository = new StorageTrackRepository();
-            for (ITrackRepository.StreamInfo track : mRepository.getAllTracks()) {
-                Log.d(LOGGER_TAG, "title: " + track.mTitle);
-                Log.d(LOGGER_TAG, "url: " + track.mUriString);
-                for (long beat : track.mMusicalityData.mStructure.mAllBeats)
-                    Log.d(LOGGER_TAG, "beat: " + beat);
-                Log.d(LOGGER_TAG, "beatCount: " + track.mMusicalityData.mStructure.mAllBeats.size());
+        mSelectButton.setOnClickListener( new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectTrack();
             }
-        }
-        else
-            Log.e(LOGGER_TAG, "Cannot read from external storage");
+        });
+
+        refreshTrackView();
     }
 
     @Override
