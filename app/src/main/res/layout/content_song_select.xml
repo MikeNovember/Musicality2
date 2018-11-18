@@ -9,17 +9,11 @@
     tools:showIn="@layout/activity_song_select"
     android:id="@+id/song_select">
 
-    <ListView android:id="@android:id/list"
+    <ListView android:id="@+id/track_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#FFFFFF"
         android:layout_weight="1"
         android:drawSelectorOnTop="false"/>
-
-    <TextView android:id="@android:id/empty"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#FFFFFF"
-        android:text="No data"/>
 
 </android.support.constraint.ConstraintLayout>

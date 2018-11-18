@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -23,12 +24,14 @@ public class SongSelectActivity extends AppCompatActivity {
     private static final String LOGGER_TAG = "MainActivity";
 
     private ITrackRepository mRepository;
+    private StreamInfoAdapter mAdapter;
+    private ListView mListView;
 
-    /*
     public static class StreamInfoAdapter extends ArrayAdapter<ITrackRepository.StreamInfo> {
 
         private static class ViewHolder {
-            private TextView itemView;
+            private TextView title;
+            private TextView url;
         }
 
         public StreamInfoAdapter(Context context, int textViewResourceId,
@@ -36,31 +39,26 @@ public class SongSelectActivity extends AppCompatActivity {
             super(context, textViewResourceId, items);
         }
 
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            ITrackRepository.StreamInfo streamInfo = getItem(position);
+            ViewHolder viewHolder;
+
             if (convertView == null) {
-                convertView = LayoutInflater.from(this.getContext())
-                        .inflate(R.layout.listview_association, parent, false);
-
                 viewHolder = new ViewHolder();
-                viewHolder.itemView = (TextView) convertView.findViewById(R.id.ItemView);
-
+                LayoutInflater inflater = LayoutInflater.from(getContext());
+                convertView = inflater.inflate(R.layout.track_list_row, parent, false);
+                viewHolder.title = convertView.findViewById(R.id.track_title);
+                viewHolder.url = convertView.findViewById(R.id.track_url);
                 convertView.setTag(viewHolder);
-            } else {
+            } else
                 viewHolder = (ViewHolder) convertView.getTag();
-            }
 
-            MyClass item = getItem(position);
-            if (item!= null) {
-                // My layout has only one TextView
-                // do whatever you want with your string and long
-                viewHolder.itemView.setText(String.format("%s %d", item.reason, item.long_val));
-            }
-
+            viewHolder.title.setText(streamInfo.mTitle);
+            viewHolder.url.setText(streamInfo.mUriString);
             return convertView;
-
         }
     }
-    */
     
     private boolean isExternalStorageReadable() {
         String state = Environment.getExternalStorageState();
@@ -69,6 +67,13 @@ public class SongSelectActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    private void onListItemClick(ITrackRepository.StreamInfo streamInfo) {
+        Intent output = new Intent();
+        output.putExtra(MainActivity.TRACK_URL_KEY, streamInfo.mUriString);
+        setResult(RESULT_OK, output);
+        finish();
     }
 
     @Override
@@ -89,14 +94,18 @@ public class SongSelectActivity extends AppCompatActivity {
         else
             Log.e(LOGGER_TAG, "Cannot read from external storage");
 
-        //StreamInfoAdapter adapter = new StreamInfoAdapter(this, 0, mRepository.getAllTracks());
-        //ListView lv = findViewById(R.id.song_select);
-        //lv.setAdapter(adapter);
+        mAdapter = new StreamInfoAdapter(this, 0, mRepository.getAllTracks());
+        mListView = findViewById(R.id.track_list);
+        mListView.setAdapter(mAdapter);
 
-        Intent output = new Intent();
-        output.putExtra(MainActivity.TRACK_URL_KEY, mRepository.getAllTracks().get(0).mUriString);
-        setResult(RESULT_OK, output);
-        finish();
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                ITrackRepository.StreamInfo streamInfo = (ITrackRepository.StreamInfo) mListView.getItemAtPosition(i);
+                onListItemClick(streamInfo);
+            }
+        });
+
     }
 
 }
