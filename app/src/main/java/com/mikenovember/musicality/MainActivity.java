@@ -7,6 +7,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
     private void killPlayer() {
         if (mPlayer != null) {
             try {
+                mPlayer.stop();
                 mPlayer.release();
                 mPlayer = null;
             } catch (Exception e) {
@@ -52,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
             mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
+                    SystemClock.sleep(200);
                     mPlayer.seekTo(msec);
                 }
             });
@@ -122,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        Log.v(LOGGER_TAG, "onPause()");
         super.onPause();
 
         SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
